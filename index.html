@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>Add-on Simral</title>
+        
+        <link rel="stylesheet" href="leaflet.css"> 
+        <script src="leaflet-src.js"></script>
+        <script src="jquery-3.3.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        
+        
+        <link rel="stylesheet" href="bootstrap.min.css">
+        <script src="bootstrap.min.js"></script>
+        
+        <style>
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            #mapdiv{
+                height:100vh;
+            }  
+        </style>
+    </head>
+    <body>
+        <div class="sidebar-content map-navigation table-responsive" id="map-navigation">
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <td><strong>SKPD</strong></td>
+                        <td>:</td>
+                        <td>[0001]BAPPEDA</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sub Unit</strong></td>
+                        <td>:</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jumlah Usulan (Rp)</strong></td>
+                        <td>:</td>
+                        <td>0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>LOKASI & ANGGARAN KEGIATAN</h4>
+            
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Usulan Dari</th>
+                        <th>Nama Lokasi</th>
+                        <th>RT</th>
+                        <th>RW</th>
+                        <th>Desa/Kel</th>
+                        <th>Volume</th>
+                        <th>Satuan</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>-</td>
+                        <td><a href="#" data-zoom="14" data-position="-6.2925771,105.8863704">Citaman</a></td>
+                        <td>8</td>
+                        <td>12</td>
+                        <td>Kec. Jiput, Kab. Pandeglang</td>
+                        <td>12</td>
+                        <td>10.000.000</td>
+                        <td>120.000.000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>-</td>
+                        <td><a href="#" data-zoom="13" data-position="-6.7846895,105.3400897">Taman Nasional Ujung Kulon</a></td>
+                        <td>1</td>
+                        <td>5</td>
+                        <td>Kec. Ujung Jaya, Kab. Pandeglang</td>
+                        <td>5</td>
+                        <td>200.000.000</td>
+                        <td>1.000.000.000</td>
+                    </tr>
+                </tbody>
+            </table>        
+        </div>
+        <h4>PETA LOKASI</h4>
+        <div id="mapdiv" class="sidebar-map"></div>
+        <script>
+        
+            var mymap; //variabel global map
+            var lyrOSM; //variabel basemap Open Street Map
+            var lyrMosaicSP;
+            var lyrMosaicLS;
+            
+            $(document).ready(function(){
+                mymap = L.map('mapdiv', 
+                              {
+                                center:[-6.9027108,106.1046345], 
+                                zoom:9,
+                                attributionControl:false,
+                                measureControl: true
+                              }
+                             );
+                 
+                //Default Basemap
+                lyrOSM=L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                              attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+                            });
+                mymap.addLayer(lyrOSM);
+                
+                 //Layer Mosaik SPOT
+                lyrMosaicSP = L.tileLayer.wms('http://103.16.223.172:8080/geoserver/Prov_Banten/wms',{
+                    layers: 'Citra Satelit - Prov Banten - Mosaik SPOT 2017',
+                    format: 'image/png',
+                    transparent: true,
+                    version: '1.1.0',                    
+                    attribution:'Data Mosaik SPOT Tahun 2017'
+                });
+                mymap.addLayer(lyrMosaicSP);
+                
+                lyrMosaicLS = L.tileLayer.wms('http://103.16.223.172:8080/geoserver/Prov_Banten/wms',{
+                    layers: 'Citra Satelit - Prov Banten - Mosaik Landsat 2017',
+                    format: 'image/png',
+                    transparent: true,
+                    version: '1.1.0',                    
+                    attribution:'Data Mosaik Landsat Tahun 2017'
+                });
+                
+                var baseMaps = {
+                    "Open Street Map": lyrOSM
+                };
+
+                var overlayMaps = {
+                    "Mosaik SPOT": lyrMosaicSP,
+                    "Mosaik Landsat": lyrMosaicLS
+                };
+                
+                L.control.layers(baseMaps, overlayMaps).addTo(mymap);
+                
+                //Zoom to location pada informasi provinsi
+                document.getElementById('map-navigation').onclick = function(abc) {
+                    var pos = abc.target.getAttribute('data-position');
+                    var zoom = abc.target.getAttribute('data-zoom');
+                    if (pos && zoom) {
+                        var locat = pos.split(',');
+                        var zoo = parseInt(zoom);
+                        mymap.setView(locat, zoo, {animation: true});
+                        return false;
+                    }
+                }
+               
+            });
+        
+        </script>
+    </body>
+</html>
