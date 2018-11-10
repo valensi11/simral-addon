@@ -9,6 +9,7 @@
         <script src="leaflet-src.js"></script>
         <script src="jquery-3.3.1.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script src="leaflet.ajax.min.js"></script>
         
         
         <link rel="stylesheet" href="bootstrap.min.css">
@@ -130,6 +131,20 @@
                     version: '1.1.0',                    
                     attribution:'Data Mosaik Landsat Tahun 2017'
                 });
+                var myStyle = {
+                    "color": "#ff7800",
+                    "weight": 1,
+                    "opacity": 0.65,
+                     fillOpacity: 0
+                };
+                function onEachFeature(feature, layer) {
+                    // does this feature have a property named popupContent?
+                    if (feature.properties && feature.properties.DESA) {
+                        layer.bindTooltip("<strong>Desa : </strong>" + feature.properties.DESA);
+                    }
+                }
+                var geojsonFeature = new L.GeoJSON.AJAX("data/batas_desa_banten.geojson", {style: myStyle,onEachFeature: onEachFeature});
+                geojsonFeature.addTo(mymap);
                 
                 var baseMaps = {
                     "Open Street Map": lyrOSM
